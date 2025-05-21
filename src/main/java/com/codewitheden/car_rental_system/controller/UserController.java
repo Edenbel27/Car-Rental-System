@@ -1,0 +1,22 @@
+// UserController.java
+package com.codewitheden.car_rental_system.controller;
+
+import com.codewitheden.car_rental_system.entity.User;
+import com.codewitheden.car_rental_system.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+
+public class UserController {
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/register")
+    public User register(@RequestBody User user) {
+        return userService.register(user);
+    }
+}
