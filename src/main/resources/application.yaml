@@ -1,0 +1,32 @@
+# Server Configuration
+server:
+  port: 8080  # Run the application on port 8080. Change if needed.
+
+# Database Configuration
+spring:
+  application:
+    name: Car_Rental_System
+  datasource:
+    url: jdbc:mysql://localhost:3306
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: MyPassword!
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # Automatically update database schema on startup.
+    show-sql: true  # Log SQL statements to the console.
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.H2Dialect  # Specify H2 dialect for Hibernate.
+
+## Logging Configuration
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG  # Log SQL queries.
+#    org.hibernate.type.descriptor.sql.BasicTypeDescriptor: TRACE  # Log parameter
+#
+## Application-Specific Configuration (Optional)
+#app:
+#  defaultCarAvailability: AVAILABLE  # Set any default configurations if needed.
