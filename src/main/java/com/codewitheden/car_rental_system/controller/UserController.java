@@ -10,11 +10,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import com.codewitheden.car_rental_system.entity.Booking;
+import com.codewitheden.car_rental_system.entity.Car;
+import com.codewitheden.car_rental_system.repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,18 +34,27 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        // Check if user already exists by email
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body("User with this email already exists.");
-        }
-        // Save new user
+@PostMapping("/register")
+public ResponseEntity<?> registerUser(@RequestBody User user) {
+    if (user.getEmail() == null) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body("Email is required.");
+    }
+    if (userRepository.findByEmail(user.getEmail()) != null) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body("User with this email already exists.");
+    }
+    try {
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully.");
+    } catch (Exception e) {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Registration failed: " + e.getMessage());
     }
+}
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -54,6 +66,17 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+
+     @Autowired
+    private BookingRepository bookingRepository;
+
+    @GetMapping("/{user_id}/cars")
+    public List<Car> getCarsRentedByUser(@PathVariable Long userId) {
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
+        return bookings.stream()
+                .map(Booking::getCar)
+                .collect(Collectors.toList());
     }
 
    @GetMapping

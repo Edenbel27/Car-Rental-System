@@ -7,6 +7,7 @@ import com.codewitheden.car_rental_system.entity.User;
 import com.codewitheden.car_rental_system.service.BookingService;
 import com.codewitheden.car_rental_system.service.CarService;
 import com.codewitheden.car_rental_system.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,8 @@ public class BookingController {
         if (car == null || !car.isAvailable()) {
             throw new RuntimeException("Car is not available");
         }
+        car.setAvailable(false);
+        carService.addCar(car);
         return bookingService.createBooking(user, car);
     }
 }

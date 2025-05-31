@@ -22,5 +22,9 @@ public class Car {
     private Double pricePerDay;
     private boolean available;
 
+    public boolean isAvailable() {
+    return available;
+}
+
 
 }

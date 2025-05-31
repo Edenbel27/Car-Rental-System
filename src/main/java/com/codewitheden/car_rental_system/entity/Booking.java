@@ -15,11 +15,11 @@ public class Booking {
     private Long id;
 
     @ManyToOne
-//    @JoinColumn(name = "car_id")
+   @JoinColumn(name = "car_id")
     private Car car;
 
     @ManyToOne
-//    @JoinColumn(name = "user_id")
+   @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime bookingDate;
