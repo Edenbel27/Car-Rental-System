@@ -5,9 +5,11 @@ import RegisterPage from "./pages/RegisterPage";
 import CarsPage from "./pages/CarsPage";
 import LoginPage from "./pages/LoginPage";
 import UserDashboard from "./pages/User/UserDashboard";
+import AdminBookingsPage from "./pages/AdminBookingsPage";
 import { useAuth } from "./provider/AuthProvider";
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import AddCar from "./components/AddCar";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -57,9 +59,24 @@ const routes = createBrowserRouter([
         path: "/rent",
         element: <CarsPage />,
       },
+      {
+        path: "/admin/bookings",
+        element: (
+          <ProtectedRoute>
+            <AdminBookingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/add-car",
+        element: (
+          <ProtectedRoute>
+            <AddCar />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
 
 export default routes;
-  

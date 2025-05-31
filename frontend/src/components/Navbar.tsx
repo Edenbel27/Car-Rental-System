@@ -31,6 +31,22 @@ const Navbar = () => {
             >
               Dashboard
             </NavLink>
+            {user.role === "ADMIN" && (
+              <>
+                <NavLink
+                  to={"/admin/bookings"}
+                  className="px-4 py-1.5 font-medium hover:text-gray-300 transition"
+                >
+                  All Bookings
+                </NavLink>
+                <NavLink
+                  to={"/admin/add-car"}
+                  className="px-4 py-1.5 font-medium hover:text-gray-300 transition"
+                >
+                  Add Car
+                </NavLink>
+              </>
+            )}
             <Button
               onClick={logout}
               className="rounded-full border border-white px-5 py-1.5 cursor-pointer text-white font-medium hover:bg-white hover:text-black transition"
