@@ -7,10 +7,10 @@ spring:
   application:
     name: Car_Rental_System
   datasource:
-    url: jdbc:mysql://localhost:3306
+    url: jdbc:mysql://localhost:3306/car_rental_db
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: MyPassword!
+    password: Helium@8271
 
 
   jpa:

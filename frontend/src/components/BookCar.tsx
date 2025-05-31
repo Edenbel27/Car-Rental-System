@@ -4,7 +4,7 @@ function BookCar() {
     const [userId, setUserId] = useState('');
     const [carId, setCarId] = useState('');
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:any) => {
         e.preventDefault();
         await fetch(`/api/bookings/book?userId=${userId}&carId=${carId}`, {
             method: 'POST',

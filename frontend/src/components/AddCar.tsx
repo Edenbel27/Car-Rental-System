@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import {type FormEvent, useState} from 'react';
 
 function AddCar() {
     const [car, setCar] = useState({ model: '', available: true });
 
-    const handleChange = (e) => {
+    const handleChange = (e:any) => {
         setCar({ ...car, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:FormEvent) => {
         e.preventDefault();
         await fetch('/api/cars', {
             method: 'POST',

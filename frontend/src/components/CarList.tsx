@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 
+interface Car {
+    id: number;
+    model: string;
+    available: boolean;
+}
+
 function CarList() {
-    const [cars, setCars] = useState([]);
+    const [cars, setCars] = useState<Car[]>([]);
 
     useEffect(() => {
         fetch('/api/cars')

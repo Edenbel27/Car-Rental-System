@@ -3,11 +3,11 @@ import { useState } from 'react';
 function MakePayment() {
     const [payment, setPayment] = useState({ amount: '', bookingId: '' });
 
-    const handleChange = (e) => {
+    const handleChange = (e:any) => {
         setPayment({ ...payment, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:any) => {
         e.preventDefault();
         await fetch('/api/payments', {
             method: 'POST',

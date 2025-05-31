@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import {type FormEvent, useState} from 'react';
 
 function RegisterUser() {
     const [user, setUser] = useState({ name: '', email: '', password: '' });
 
-    const handleChange = (e) => {
+    const handleChange = (e:any) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:FormEvent) => {
         e.preventDefault();
         await fetch('/api/auth/register', {
             method: 'POST',
