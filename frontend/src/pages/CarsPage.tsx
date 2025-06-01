@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   CardFooter,
+  CardHeader,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { useAuth } from "../provider/AuthProvider";
 import { Skeleton } from "../components/ui/skeleton.tsx";
-import apiClient from "../api/apiClient.ts";
+import { useAuth } from "../provider/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 interface Car {
   id: number;
@@ -26,8 +25,8 @@ const CarsPage = () => {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [search, setSearch] = useState("");
 
-  const { user } = useAuth();
   const wsRef = useRef<WebSocket | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws/cars");
@@ -63,8 +62,8 @@ const CarsPage = () => {
     return <div className="text-center text-red-500 py-20">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-black py-12 px-4 flex flex-col items-center">
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">
+    <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-neutral-900 dark:to-black py-12 px-4 flex flex-col items-center transition-colors duration-300">
+      <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-8">
         Available Cars
       </h1>
       <div className="w-full max-w-3xl mb-10 flex flex-col md:flex-row gap-4 items-center justify-center">
@@ -73,7 +72,7 @@ const CarsPage = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by brand or model..."
-          className="w-full md:w-96 rounded-md px-4 py-2 bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow"
+          className="w-full md:w-96 rounded-md px-4 py-2 bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow transition-colors duration-300"
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
@@ -81,7 +80,7 @@ const CarsPage = () => {
           Array.from({ length: 6 }).map((_, idx) => (
             <Card
               key={idx}
-              className="bg-neutral-800 text-white flex flex-col shadow-lg border-0 animate-pulse"
+              className="bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white flex flex-col shadow-lg border-0 animate-pulse transition-colors duration-300"
             >
               <CardHeader>
                 <Skeleton className="h-6 w-32 mx-auto mb-2 rounded" />
@@ -104,39 +103,50 @@ const CarsPage = () => {
           filteredCars.map((car) => (
             <Card
               key={car.id}
-              className="bg-neutral-800 text-white flex flex-col shadow-lg border-0"
+              className="bg-neutral-100 z-10 dark:bg-neutral-800 text-black dark:text-white overflow-clip flex flex-col shadow-lg border-0 transition-colors duration-300 relative rounded-2xl"
             >
-              <CardHeader>
-                <CardTitle className="text-xl text-center font-semibold">
-                  {car.make} {car.model}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              {/* Car image as background */}
+              <div className="relative w-full -z-10 flex items-center justify-center">
                 <img
                   src={"/car.jpg"}
                   alt={car.model}
-                  className="w-full h-48 object-cover rounded mb-4 border border-neutral-900"
+                  className="w-full h-50 -mt-7 object-cover z-0"
                 />
-                <div className="mb-2 text-gray-300">
-                  Price/Day:{" "}
-                  <span className="font-medium text-white">
-                    ${car.pricePerDay}
+                <div className="flex z-10 absolute top-0 left-3 justify-between items-start mb-2">
+                  <div className="flex gap-2">
+                    {car.available && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500 text-white shadow">
+                        Available
+                      </span>
+                    )}
+                    {!car.available && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white shadow">
+                        Rented
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* Top badges */}
+              <div className="px-4 pb-2 flex flex-col gap-1 relative z-10">
+                <div className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+                  {car.make}
+                </div>
+                <div className="text-lg font-bold text-black dark:text-white">
+                  {car.model}
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xl font-bold text-black dark:text-white">
+                    ${car.pricePerDay.toFixed(2)}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    /day
                   </span>
                 </div>
-                <div className="mb-2 text-gray-300">
-                  Status:{" "}
-                  <span
-                    className={
-                      car.available ? "text-green-400" : "text-red-400"
-                    }
-                  >
-                    {car.available ? "Available" : "Unavailable"}
-                  </span>
-                </div>
-              </CardContent>
+              </div>
               <CardFooter>
                 <Button
-                  className="w-full bg-black text-white hover:bg-white hover:text-black transition rounded-full font-semibold"
+                  className="w-full bg-black text-white hover:bg-white hover:text-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white transition rounded-full font-semibold"
                   disabled={!car.available}
                   onClick={() => setSelectedCar(car)}
                 >
@@ -149,7 +159,7 @@ const CarsPage = () => {
       </div>
       {selectedCar && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full text-black relative shadow-2xl">
+          <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 max-w-md w-full text-black dark:text-white relative shadow-2xl transition-colors duration-300">
             <button
               className="absolute top-2 right-4 text-2xl hover:text-red-500"
               onClick={() => setSelectedCar(null)}
@@ -172,41 +182,8 @@ const CarsPage = () => {
               <span className="font-medium">${selectedCar.pricePerDay}</span>
             </div>
             <Button
-              className="w-full mt-4 bg-black text-white hover:bg-neutral-800 rounded-full font-semibold"
-              onClick={async () => {
-                try {
-                  if (
-                    wsRef.current &&
-                    wsRef.current.readyState === WebSocket.OPEN
-                  ) {
-                    wsRef.current.send(
-                      JSON.stringify({
-                        action: "book",
-                        userId: user?.id,
-                        carId: selectedCar.id,
-                      })
-                    );
-                    alert(
-                      `Successfully booked the ${selectedCar.make} ${selectedCar.model}!`
-                    );
-                    // Optionally update car list to reflect booking
-                    setCars((prev) =>
-                      prev.map((car) =>
-                        car.id === selectedCar.id
-                          ? { ...car, available: false }
-                          : car
-                      )
-                    );
-                    // Notify the WebSocket to refresh cars list
-                    wsRef.current.send(JSON.stringify({ action: "refresh" }));
-                  } else {
-                    alert("WebSocket not connected. Please try again.");
-                  }
-                } catch (err) {
-                  alert("Failed to book the car. Please try again.");
-                }
-                setSelectedCar(null);
-              }}
+              className="w-full mt-4 bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white rounded-full font-semibold"
+              onClick={() => navigate(`/car/${selectedCar.id}`)}
             >
               Confirm Selection
             </Button>

@@ -8,6 +8,7 @@ import UserDashboard from "./pages/User/UserDashboard";
 import { useAuth } from "./provider/AuthProvider";
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import CarDetail from "./pages/User/CarDetail";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -57,9 +58,16 @@ const routes = createBrowserRouter([
         path: "/rent",
         element: <CarsPage />,
       },
+      {
+        path: "/car/:id",
+        element: (
+          <ProtectedRoute>
+            <CarDetail />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
 
 export default routes;
-  

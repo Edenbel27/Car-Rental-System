@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const carImages = [
   {
@@ -25,14 +25,22 @@ const HomePage = () => {
     setCurrent((prev) => (prev === total - 1 ? 0 : prev + 1));
   const goToSlide = (idx: number) => setCurrent(idx);
 
+  // Auto-advance carousel every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev === total - 1 ? 0 : prev + 1));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [total]);
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-neutral-900 to-black flex flex-col items-center justify-start px-4">
+    <div className="min-h-screen w-full bg-white dark:bg-gradient-to-b dark:from-neutral-900 dark:to-black flex flex-col items-center justify-start px-4 transition-colors duration-300">
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto text-center pt-24 pb-20">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+        <h1 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4 leading-tight">
           Welcome to DigiCars
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
+        <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl">
           Premium car rentals made easy. Choose from our digital-first fleet and
           drive with confidence, style, and convenience.
         </p>
@@ -78,10 +86,10 @@ const HomePage = () => {
       </section>
       {/* About Us Section */}
       <section className="w-full max-w-4xl mx-auto text-center py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-4">
           About DigiCars
         </h2>
-        <p className="text-lg text-gray-300 mb-10">
+        <p className="text-lg text-gray-700 dark:text-gray-300 mb-10">
           DigiCars is your trusted partner for premium car rentals. We offer a
           modern, digital-first experience with a diverse fleet of top-tier
           vehicles, making it easy and convenient to drive the car you want,
@@ -89,31 +97,31 @@ const HomePage = () => {
           special event, DigiCars delivers flexibility, reliability, and style.
         </p>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch mt-8">
-          <div className="bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center">
-            <h3 className="text-xl font-semibold text-white mb-2">
+          <div className="bg-neutral-100 dark:bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center transition-colors duration-300">
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
               Wide Selection
             </h3>
-            <p className="text-gray-400">
+            <p className="text-gray-700 dark:text-gray-400">
               From luxury sedans to sporty convertibles and practical SUVs,
               DigiCars has the perfect vehicle for every occasion and
               preference.
             </p>
           </div>
-          <div className="bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center">
-            <h3 className="text-xl font-semibold text-white mb-2">
+          <div className="bg-neutral-100 dark:bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center transition-colors duration-300">
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
               Seamless Booking
             </h3>
-            <p className="text-gray-400">
+            <p className="text-gray-700 dark:text-gray-400">
               Book your car in minutes with our easy-to-use online platform.
               Enjoy transparent pricing, instant confirmation, and flexible
               rental terms.
             </p>
           </div>
-          <div className="bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center">
-            <h3 className="text-xl font-semibold text-white mb-2">
+          <div className="bg-neutral-100 dark:bg-neutral-800 rounded-xl p-8 shadow w-full md:w-1/3 flex flex-col items-center transition-colors duration-300">
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
               Customer Focused
             </h3>
-            <p className="text-gray-400">
+            <p className="text-gray-700 dark:text-gray-400">
               Our team is dedicated to your satisfaction, offering 24/7 support
               and tailored solutions to make your rental experience smooth and
               enjoyable.
@@ -123,30 +131,30 @@ const HomePage = () => {
       </section>
       {/* Contact Section */}
       <section className="w-full max-w-4xl mx-auto text-center py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-4">
           Contact DigiCars
         </h2>
-        <p className="text-lg text-gray-300 mb-8">
+        <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
           Have questions or ready to book your next ride? Reach out to DigiCars
           for fast, friendly assistance and personalized service.
         </p>
-        <form className="bg-neutral-800 rounded-xl p-8 shadow flex flex-col gap-4 max-w-xl mx-auto">
+        <form className="bg-neutral-100 dark:bg-neutral-800 rounded-xl p-8 shadow flex flex-col gap-4 max-w-xl mx-auto transition-colors duration-300">
           <input
             type="text"
             placeholder="Your Name"
-            className="rounded-md px-4 py-2 bg-neutral-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-md px-4 py-2 bg-neutral-200 dark:bg-neutral-900 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
           <input
             type="email"
             placeholder="Your Email"
-            className="rounded-md px-4 py-2 bg-neutral-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-md px-4 py-2 bg-neutral-200 dark:bg-neutral-900 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
           <textarea
             placeholder="Your Message"
             rows={4}
-            className="rounded-md px-4 py-2 bg-neutral-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-md px-4 py-2 bg-neutral-200 dark:bg-neutral-900 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           ></textarea>
           <button
@@ -157,7 +165,6 @@ const HomePage = () => {
           </button>
         </form>
       </section>
-      
     </div>
   );
 };

@@ -25,6 +25,10 @@ public class CarService {
         return carRepository.findByIdAndAvailable(id, true);
     }
 
+    public Car getCarById(Long id) {
+        return carRepository.findById(id).orElse(null);
+    }
+
     public void bookCar(Long carId, Long userId) {
         Car car = carRepository.findById(carId).orElse(null);
         if (car != null && car.isAvailable()) {

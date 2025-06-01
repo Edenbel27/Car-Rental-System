@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../api/apiClient";
-import { useAuth } from "../../provider/AuthProvider";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+  Card
 } from "../../components/ui/card";
-import { Skeleton } from "../../components/ui/skeleton.tsx";
+import { useAuth } from "../../provider/AuthProvider";
 
 interface Booking {
   id: number;
@@ -37,103 +33,89 @@ const UserDashboard = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
+  const handlePay = async (booking: Booking) => {
+    const amount = booking.car.pricePerDay;
+    try {
+      await apiClient.post("/api/payments", {
+        amount,
+        bookingId: booking.id,
+      });
+      alert("Payment successful!");
+      // Remove the booking from the UI after successful payment
+      setBookings((prev) => prev.filter((b) => b.id !== booking.id));
+    } catch {
+      alert("Payment failed.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-black py-12 px-4 flex flex-col items-center">
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">
+    <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-neutral-900 dark:to-black py-12 px-4 flex flex-col transition-colors duration-300">
+      <h2 className="text-3xl font-bold mb-4 text-black dark:text-white">
+        Welcome{user?.username ? `, ${user.username}` : ""}!
+      </h2>
+      <p className="mb-8 text-shadow-md text-shadow-white/10 text-neutral-700 dark:text-neutral-300 max-w-2xl">
+        Discover the freedom and flexibility of renting a car! Whether you need a vehicle for a weekend getaway, a business trip, or simply want to explore new places at your own pace, our car rental service offers a convenient and affordable solution tailored to your needs.
+      </p>
+
+      <h3 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-8">
         My Rented Cars
-      </h1>
+      </h3>
       {error && <div className="text-red-500 mb-4">{error}</div>}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-        {loading ? (
-          Array.from({ length: 3 }).map((_, idx) => (
-            <Card
-              key={idx}
-              className="bg-neutral-800 text-white flex flex-col shadow-lg border-0 animate-pulse"
-            >
-              <CardHeader>
-                <Skeleton className="h-6 w-32 mx-auto mb-2 rounded" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="w-full h-40 mb-4 rounded border border-neutral-900" />
-                <Skeleton className="h-4 w-24 mb-2 rounded" />
-                <Skeleton className="h-4 w-20 mb-2 rounded" />
-              </CardContent>
-            </Card>
-          ))
-        ) : bookings.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400 py-20">
-            You have not rented any cars yet.
-          </div>
-        ) : (
-          bookings.map((booking) => (
-            <Card
-              key={booking.id}
-              className="bg-neutral-800 text-white flex flex-col shadow-lg border-0"
-            >
-              <CardHeader>
-                <CardTitle className="text-xl text-center font-semibold">
-                  {booking.car.make} {booking.car.model}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <img
-                  src="/car.jpg"
-                  alt={booking.car.model}
-                  className="w-full h-40 object-cover rounded mb-4 border border-neutral-900"
-                />
-                <div className="mb-2 text-gray-300">
-                  Price/Day:{" "}
-                  <span className="font-medium text-white">
-                    ${booking.car.pricePerDay}
-                  </span>
-                </div>
-                <div className="mb-2 text-gray-300">
-                  Booking Date:{" "}
-                  <span className="font-medium text-white">
-                    {new Date(booking.bookingDate).toLocaleString()}
-                  </span>
-                </div>
-                <div className="mb-2 text-gray-300">
-                  Return Date:{" "}
-                  <span className="font-medium text-white">
-                    {booking.returnDate
-                      ? new Date(booking.returnDate).toLocaleString()
-                      : "Not returned yet"}
-                  </span>
-                </div>
-              </CardContent>
-              <div className="p-4 border-t border-neutral-700 flex justify-end">
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const amount = booking.car.pricePerDay;
-                    try {
-                      await apiClient.post("/api/payments", {
-                        amount,
-                        bookingId: booking.id,
-                      });
-                      alert("Payment successful!");
-                      // Remove the booking from the UI after successful payment
-                      setBookings((prev) =>
-                        prev.filter((b) => b.id !== booking.id)
-                      );
-                    } catch {
-                      alert("Payment failed.");
-                    }
-                  }}
-                  className="w-full flex gap-2"
-                >
-                  <button
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold w-full"
-                  >
-                    Pay ${booking.car.pricePerDay}
+      <div className="w-[80%]">
+        <table className="w-full text-left border-separate border-spacing-y-2">
+          <thead>
+            <tr className="text-neutral-400 text-xs">
+              <th className="p-2">Booking Number</th>
+              <th className="p-2">Booking Date</th>
+              <th className="p-2">Model</th>
+              <th className="p-2">Maker</th>
+              <th className="p-2">Amount</th>
+              <th className="p-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking) => (
+              <tr
+                key={booking.id}
+                className="dark:bg-neutral-800 bg-neutral-800/10 rounded-xl"
+              >
+                <td className="p-2 font-mono text-xs">#{booking.id}</td>
+                <td className="p-2">
+                  {new Date(booking.bookingDate).toLocaleDateString()}
+                </td>
+                <td className="p-2">{booking.car.model}</td>
+                <td className="p-2">{booking.car.make}</td>
+                <td className="p-2">${booking.car.pricePerDay}</td>
+                <td className="p-2 space-x-2">
+                  <button className="bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded font-semibold text-xs">
+                    View
                   </button>
-                </form>
-              </div>
-            </Card>
-          ))
-        )}
+                  <button
+                    onClick={() => handlePay(booking)}
+                    className="bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded font-semibold text-xs"
+                  >
+                    Pay
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {bookings.length === 0 && !loading && (
+              <tr>
+                <td colSpan={6} className="text-center text-gray-400 py-4">
+                  You have not rented any cars yet.
+                </td>
+              </tr>
+            )}
+            {loading &&
+              Array.from({ length: 3 }).map((_, idx) => (
+                <tr>
+                  <td key={idx} colSpan={6}>
+                    <Card className="bg-neutral-100 rounded-none dark:bg-neutral-800 text-black dark:text-white flex flex-col border-0 animate-pulse transition-colors duration-300"></Card>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

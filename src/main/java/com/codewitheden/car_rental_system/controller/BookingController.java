@@ -9,6 +9,9 @@ import com.codewitheden.car_rental_system.service.CarService;
 import com.codewitheden.car_rental_system.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +29,7 @@ public class BookingController {
     private CarService carService;
 
     @PostMapping("/book")
-    public Booking bookCar(@RequestParam Long userId, @RequestParam Long carId) {
+    public Booking bookCar(@RequestParam Long userId, @RequestParam Long carId, @RequestParam LocalDateTime rDateTime) {
         User user = userService.findById(userId); // You need to implement this method
         Car car = carService.findAvailableCar(carId);
         if (car == null || !car.isAvailable()) {
@@ -34,7 +37,8 @@ public class BookingController {
         }
         car.setAvailable(false);
         carService.addCar(car);
-        return bookingService.createBooking(user, car);
+
+        return bookingService.createBooking(user, car, rDateTime);
     }
 
     @GetMapping("/user/{userId}")

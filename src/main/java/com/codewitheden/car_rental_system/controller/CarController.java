@@ -24,4 +24,8 @@ public class CarController {
     public Car addCar(@RequestBody Car car) {
         return carService.addCar(car);
     }
+    @GetMapping("/{id}")
+    public Car getCarById(@PathVariable Long id) {
+        return carService.getCarById(id);
+    }
 }

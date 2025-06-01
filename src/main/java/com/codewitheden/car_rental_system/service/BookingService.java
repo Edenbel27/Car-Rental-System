@@ -15,11 +15,12 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public Booking createBooking(User user, Car car) {
+    public Booking createBooking(User user, Car car, LocalDateTime rDateTime) {
         Booking booking = new Booking();
         booking.setUser(user);
         booking.setCar(car);
         booking.setBookingDate(LocalDateTime.now());
+        booking.setReturnDate(rDateTime);
         return bookingRepository.save(booking);
     }
 
