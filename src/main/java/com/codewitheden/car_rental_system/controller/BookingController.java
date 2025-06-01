@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -42,14 +41,14 @@ public class BookingController {
 
         return bookingService.createBooking(user, car, rDateTime);
     }
+
     @GetMapping("/user/{userId}")
     public java.util.List<Booking> getBookingsByUser(@PathVariable Long userId) {
         return bookingService.getBookingsByUserId(userId);
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
     public List<Booking> getAllBookings() {
         return bookingService.getAllBookings();
     }
-    }
+}

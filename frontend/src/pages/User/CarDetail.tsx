@@ -27,7 +27,7 @@ const CarDetail = () => {
       .get(`/api/cars/${id}`)
       .then((res) => {
         setCar(res.data);
-        setMainImg(res.data.images?.[0] || "/car.jpg");
+        setMainImg(res.data.imageUrl || "/car.jpg");
       })
       .catch(() => {
         setError("Failed to load car details.");
@@ -48,7 +48,7 @@ const CarDetail = () => {
   if (!car) return null;
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 py-8 px-2 md:px-8 flex flex-col items-center transition-colors duration-300">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 py-8 px-2 md:px-8 flex flex-col items-center justify-center transition-colors duration-300">
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left: Car details and gallery */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow p-6 flex flex-col gap-6">
@@ -72,17 +72,19 @@ const CarDetail = () => {
             </div>
           </div>
           <div className="flex gap-2 mb-4">
-            {(car.images || ["/car.jpg"]).map((img: string, idx: number) => (
-              <img
-                key={idx}
-                src={img}
-                alt="thumb"
-                className={`w-20 h-14 object-cover rounded-lg border-2 cursor-pointer ${
-                  mainImg === img ? "border-blue-500" : "border-transparent"
-                }`}
-                onClick={() => setMainImg(img)}
-              />
-            ))}
+            {(car.images || [car.imageUrl || "/car.jpg"]).map(
+              (img: string, idx: number) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt="thumb"
+                  className={`w-20 h-14 object-cover rounded-lg border-2 cursor-pointer ${
+                    mainImg === img ? "border-blue-500" : "border-transparent"
+                  }`}
+                  onClick={() => setMainImg(img)}
+                />
+              )
+            )}
           </div>
           <div className="mb-2 text-gray-500 dark:text-gray-400 text-sm font-medium">
             {car.make}
@@ -95,34 +97,27 @@ const CarDetail = () => {
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Year</span>
+              <span className="text-gray-500">Model</span>
               <span className="font-semibold text-black dark:text-white">
-                {car.year}
+                {car.model}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Type</span>
+              <span className="text-gray-500">Make</span>
               <span className="font-semibold text-black dark:text-white">
-                {car.type}
+                {car.make}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Color</span>
-              <span className="flex items-center gap-1 font-semibold text-black dark:text-white">
-                <span className="w-3 h-3 rounded-full bg-blue-900 border border-blue-400"></span>
-                {car.color}
+              <span className="text-gray-500">Price Per Day</span>
+              <span className="font-semibold text-black dark:text-white">
+                ${car.pricePerDay?.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Rental type</span>
+              <span className="text-gray-500">Available</span>
               <span className="font-semibold text-black dark:text-white">
-                Per hour
-              </span>
-            </div>
-            <div className="flex justify-between col-span-2">
-              <span className="text-gray-500">Car insurance</span>
-              <span className="font-semibold text-black dark:text-white">
-                {car.insurance}
+                {car.available ? "Yes" : "No"}
               </span>
             </div>
           </div>
@@ -144,7 +139,7 @@ const CarDetail = () => {
             </div>
             <div className="rounded-xl overflow-hidden mb-4">
               <img
-                src="/car.jpg"
+                src={car.imageUrl || "/car.jpg"}
                 alt="map"
                 className="w-full h-40 object-cover"
               />
@@ -254,7 +249,7 @@ const CarDetail = () => {
                         action: "book",
                         userId: user?.id,
                         carId: car.id,
-                        returnDate: pickup, // ISO string, backend should parse
+                        rDateTime: pickup, // ISO string, backend should parse
                       })
                     );
                     setBookingSuccess("Booking sent via WebSocket!");

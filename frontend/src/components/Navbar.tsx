@@ -33,6 +33,22 @@ const Navbar = () => {
               >
                 Dashboard
               </NavLink>
+              {user.role === "ADMIN" && (
+                <>
+                  <NavLink
+                    to={"/admin/bookings"}
+                    className="px-4 py-1.5 font-medium hover:text-gray-300 transition"
+                  >
+                    All Bookings
+                  </NavLink>
+                  <NavLink
+                    to={"/admin/add-car"}
+                    className="px-4 py-1.5 font-medium hover:text-gray-300 transition"
+                  >
+                    Add Car
+                  </NavLink>
+                </>
+              )}
               <NavLink
                 to="/rent"
                 className="px-4 py-1.5 font-medium hover:text-gray-300 transition"

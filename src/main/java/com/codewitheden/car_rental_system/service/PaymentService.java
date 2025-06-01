@@ -3,10 +3,10 @@ package com.codewitheden.car_rental_system.service;
 import com.codewitheden.car_rental_system.entity.Payment;
 import com.codewitheden.car_rental_system.repository.PaymentRepository;
 import com.codewitheden.car_rental_system.repository.BookingRepository;
-import com.codewitheden.car_rental_system.repository.CarRepository;
 import com.codewitheden.car_rental_system.entity.Booking;
 import com.codewitheden.car_rental_system.entity.Car;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,9 @@ public class PaymentService {
     @Autowired
     private BookingRepository bookingRepository;
     @Autowired
-    private CarRepository carRepository;
+    private CarService carService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Async
     public Payment processPayment(Payment payment) {
@@ -33,7 +35,9 @@ public class PaymentService {
                 Car car = booking.getCar();
                 if (car != null) {
                     car.setAvailable(true);
-                    carRepository.save(car);
+                    carService.updateCar(car);
+                    // Publish car change event
+                    eventPublisher.publishEvent(new CarService.CarChangeEvent(this, car));
                 }
                 bookingRepository.deleteById(booking.getId());
             }

@@ -5,7 +5,6 @@ import com.codewitheden.car_rental_system.entity.Car;
 import com.codewitheden.car_rental_system.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ public class CarController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Car addCar(@RequestBody Car car) {
         return carService.addCar(car);
     }

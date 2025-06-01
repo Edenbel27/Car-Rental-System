@@ -3,7 +3,6 @@ package com.codewitheden.car_rental_system.service;
 
 import com.codewitheden.car_rental_system.entity.User;
 import com.codewitheden.car_rental_system.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

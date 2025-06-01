@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.rest.core.event.AfterCreateEvent;
+import org.springframework.data.rest.core.event.AfterSaveEvent;
+import org.springframework.data.rest.core.event.AfterDeleteEvent;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
+import javax.persistence.PostRemove;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +66,7 @@ public class CarSocketHandler extends TextWebSocketHandler {
             } else if ("book".equals(action)) {
                 Long userId = node.has("userId") ? node.get("userId").asLong() : null;
                 Long carId = node.has("carId") ? node.get("carId").asLong() : null;
+                String rDateTime = node.has("rDateTime") ? node.get("rDateTime").asText() : null;
                 if (userId != null && carId != null) {
                     com.codewitheden.car_rental_system.entity.User user = userService.findById(userId);
                     com.codewitheden.car_rental_system.entity.Car car = carService.findAvailableCar(carId);
@@ -66,7 +76,7 @@ public class CarSocketHandler extends TextWebSocketHandler {
                     }
                     car.setAvailable(false);
                     carService.addCar(car);
-                    bookingService.createBooking(user, car);
+                    bookingService.createBooking(user, car, java.time.LocalDateTime.parse(rDateTime));
                     broadcastCars();
                 }
             }
@@ -81,6 +91,83 @@ public class CarSocketHandler extends TextWebSocketHandler {
         for (WebSocketSession sess : sessions) {
             if (sess.isOpen()) {
                 sess.sendMessage(new TextMessage(carsJson));
+            }
+        }
+    }
+
+    @Component
+    public class CarRepositoryListener {
+
+        private final CarService carService;
+        private final ObjectMapper objectMapper;
+        private final Set<WebSocketSession> sessions;
+
+        public CarRepositoryListener(CarService carService, ObjectMapper objectMapper, Set<WebSocketSession> sessions) {
+            this.carService = carService;
+            this.objectMapper = objectMapper;
+            this.sessions = sessions;
+        }
+
+        @PostPersist
+        @PostUpdate
+        @PostRemove
+        public void onCarChange() {
+            broadcastCars();
+        }
+
+        private void broadcastCars() {
+            try {
+                List<Car> cars = carService.getAllCars();
+                String carsJson = objectMapper.writeValueAsString(cars);
+                for (WebSocketSession sess : sessions) {
+                    if (sess.isOpen()) {
+                        sess.sendMessage(new TextMessage(carsJson));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Component
+    public class CarChangeListener {
+
+        private final CarService carService;
+        private final ObjectMapper objectMapper;
+        private final Set<WebSocketSession> sessions;
+
+        public CarChangeListener(CarService carService, ObjectMapper objectMapper, Set<WebSocketSession> sessions) {
+            this.carService = carService;
+            this.objectMapper = objectMapper;
+            this.sessions = sessions;
+        }
+
+        @EventListener
+        public void handleCarChange(CarService.CarChangeEvent event) {
+            broadcastCars();
+        }
+
+        private void broadcastCars() {
+            try {
+                List<Car> cars = carService.getAllCars();
+                String carsJson = objectMapper.writeValueAsString(cars);
+                for (WebSocketSession sess : sessions) {
+                    if (sess.isOpen()) {
+                        sess.sendMessage(new TextMessage(carsJson));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @EventListener
+        public void handlePaymentEvent(CarService.CarChangeEvent event) {
+            try {
+                broadcastCars();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

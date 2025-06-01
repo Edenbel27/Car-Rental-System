@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../api/apiClient";
-import {
-  Card
-} from "../../components/ui/card";
 import { useAuth } from "../../provider/AuthProvider";
+import { Button } from "../../components/ui/button";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
+} from "../../components/ui/table";
 
 interface Booking {
   id: number;
@@ -22,19 +27,36 @@ const UserDashboard = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("card");
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     apiClient
       .get<Booking[]>(`/api/bookings/user/${user.id}`)
-      .then((res) => setBookings(res.data))
-      .catch(() => setError("Failed to load your bookings."))
+      .then((res) => {
+        console.log(res.data);
+
+        setBookings(res.data);
+      })
+      .catch((err) => {
+        setError("Failed to load your bookings.");
+        console.error(err);
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
+  const diffDays = (booking: Booking) => {
+    const bookingDate = new Date(booking.bookingDate);
+    const today = new Date();
+    const diffTime = today.getTime() - bookingDate.getTime();
+    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+    return diffDays;
+  };
+
   const handlePay = async (booking: Booking) => {
-    const amount = booking.car.pricePerDay;
+    const amount = booking.car.pricePerDay * diffDays(booking);
     try {
       await apiClient.post("/api/payments", {
         amount,
@@ -54,69 +76,132 @@ const UserDashboard = () => {
         Welcome{user?.username ? `, ${user.username}` : ""}!
       </h2>
       <p className="mb-8 text-shadow-md text-shadow-white/10 text-neutral-700 dark:text-neutral-300 max-w-2xl">
-        Discover the freedom and flexibility of renting a car! Whether you need a vehicle for a weekend getaway, a business trip, or simply want to explore new places at your own pace, our car rental service offers a convenient and affordable solution tailored to your needs.
+        Discover the freedom and flexibility of renting a car! Whether you need
+        a vehicle for a weekend getaway, a business trip, or simply want to
+        explore new places at your own pace, our car rental service offers a
+        convenient and affordable solution tailored to your needs.
       </p>
 
       <h3 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-8">
         My Rented Cars
       </h3>
+      <div className="mb-6">
+        <Button
+          onClick={() => setViewMode(viewMode === "card" ? "table" : "card")}
+          className="w-full rounded-full bg-gradient-to-b from-gray-200 to-gray-400 dark:from-gray-200 dark:to-gray-400 text-black font-semibold shadow hover:from-white hover:to-gray-300 transition"
+        >
+          {viewMode === "card" ? "Switch to Table View" : "Switch to Card View"}
+        </Button>
+      </div>
       {error && <div className="text-red-500 mb-4">{error}</div>}
-      <div className="w-[80%]">
-        <table className="w-full text-left border-separate border-spacing-y-2">
-          <thead>
-            <tr className="text-neutral-400 text-xs">
-              <th className="p-2">Booking Number</th>
-              <th className="p-2">Booking Date</th>
-              <th className="p-2">Model</th>
-              <th className="p-2">Maker</th>
-              <th className="p-2">Amount</th>
-              <th className="p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+      {viewMode === "card" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+          {bookings.map((booking) => (
+            <div
+              key={booking.id}
+              className="bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white p-6 rounded shadow-lg flex flex-col gap-2"
+            >
+              <div className="font-semibold text-lg">
+                {booking.car.make} {booking.car.model}
+              </div>
+              <div className="text-sm text-gray-500">
+                Booking ID: #{booking.id}
+              </div>
+              <div className="text-sm">
+                Booking Date:{" "}
+                {new Date(booking.bookingDate).toLocaleDateString()}
+              </div>
+              <div className="text-sm">
+                Price/Day: ${booking.car.pricePerDay}
+              </div>
+              <div className="text-sm">
+                Total Amount: ${diffDays(booking) * booking.car.pricePerDay}
+              </div>
+              <div className="flex flex-wrap gap-2 justify-between mt-4">
+                <Button className="w-full rounded-full bg-gradient-to-b from-gray-200 to-gray-400 dark:from-gray-200 dark:to-gray-400 text-black font-semibold shadow hover:from-white hover:to-gray-300 transition">
+                  View
+                </Button>
+                <Button
+                  onClick={() => handlePay(booking)}
+                  className="w-full rounded-full bg-gradient-to-b from-gray-200 to-gray-400 dark:from-gray-200 dark:to-gray-400 text-black font-semibold shadow hover:from-white hover:to-gray-300 transition"
+                >
+                  Pay
+                </Button>
+              </div>
+            </div>
+          ))}
+          {bookings.length === 0 && !loading && (
+            <div className="text-center text-gray-400 py-4">
+              You have not rented any cars yet.
+            </div>
+          )}
+          {loading &&
+            Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white p-6 rounded shadow-lg animate-pulse"
+              ></div>
+            ))}
+        </div>
+      ) : (
+        <Table className="w-full text-left border-separate border-spacing-y-2">
+          <TableHeader>
+            <TableRow>
+              <TableCell>Booking Number</TableCell>
+              <TableCell>Booking Date</TableCell>
+              <TableCell>Model</TableCell>
+              <TableCell>Maker</TableCell>
+              <TableCell>Amount</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {bookings.map((booking) => (
-              <tr
-                key={booking.id}
-                className="dark:bg-neutral-800 bg-neutral-800/10 rounded-xl"
-              >
-                <td className="p-2 font-mono text-xs">#{booking.id}</td>
-                <td className="p-2">
+              <TableRow key={booking.id}>
+                <TableCell>#{booking.id}</TableCell>
+                <TableCell>
                   {new Date(booking.bookingDate).toLocaleDateString()}
-                </td>
-                <td className="p-2">{booking.car.model}</td>
-                <td className="p-2">{booking.car.make}</td>
-                <td className="p-2">${booking.car.pricePerDay}</td>
-                <td className="p-2 space-x-2">
-                  <button className="bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded font-semibold text-xs">
-                    View
-                  </button>
-                  <button
-                    onClick={() => handlePay(booking)}
-                    className="bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded font-semibold text-xs"
-                  >
-                    Pay
-                  </button>
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell>{booking.car.model}</TableCell>
+                <TableCell>{booking.car.make}</TableCell>
+                <TableCell>
+                  ${diffDays(booking) * booking.car.pricePerDay}
+                </TableCell>
+                <TableCell>
+                  <div className="space-x-2">
+                    <Button className="w-full rounded-full bg-gradient-to-b from-gray-200 to-gray-400 dark:from-gray-200 dark:to-gray-400 text-black font-semibold shadow hover:from-white hover:to-gray-300 transition">
+                      View
+                    </Button>
+                    <Button
+                      onClick={() => handlePay(booking)}
+                      className="w-full rounded-full bg-gradient-to-b from-gray-200 to-gray-400 dark:from-gray-200 dark:to-gray-400 text-black font-semibold shadow hover:from-white hover:to-gray-300 transition"
+                    >
+                      Pay
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             ))}
             {bookings.length === 0 && !loading && (
-              <tr>
-                <td colSpan={6} className="text-center text-gray-400 py-4">
-                  You have not rented any cars yet.
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell>
+                  <div className="text-center text-gray-400 py-4">
+                    You have not rented any cars yet.
+                  </div>
+                </TableCell>
+              </TableRow>
             )}
             {loading &&
               Array.from({ length: 3 }).map((_, idx) => (
-                <tr>
-                  <td key={idx} colSpan={6}>
-                    <Card className="bg-neutral-100 rounded-none dark:bg-neutral-800 text-black dark:text-white flex flex-col border-0 animate-pulse transition-colors duration-300"></Card>
-                  </td>
-                </tr>
+                <TableRow key={idx}>
+                  <TableCell>
+                    <div className="bg-neutral-100 rounded-none dark:bg-neutral-800 text-black dark:text-white flex flex-col border-0 animate-pulse transition-colors duration-300"></div>
+                  </TableCell>
+                </TableRow>
               ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

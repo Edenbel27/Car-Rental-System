@@ -14,18 +14,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
-                .requestMatchers("/api/cars").permitAll()
-                .requestMatchers("/api/bookings/user/**").hasAnyRole(ROLE_ADMIN, ROLE_CUSTOMER)
-                .requestMatchers("/api/bookings/all").hasRole(ROLE_ADMIN)
-                .anyRequest().permitAll()
-            )
-            .formLogin(withDefaults());
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll() // Make all endpoints accessible without authentication
+                )
+                .formLogin(withDefaults());
         return http.build();
     }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -7,13 +8,12 @@ import {
   CardHeader,
 } from "../components/ui/card";
 import { Skeleton } from "../components/ui/skeleton.tsx";
-import { useAuth } from "../provider/AuthProvider";
-import { useNavigate } from "react-router-dom";
 
 interface Car {
   id: number;
   model: string;
   make: string;
+  imageUrl: string;
   pricePerDay: number;
   available: boolean;
 }
@@ -30,9 +30,6 @@ const CarsPage = () => {
 
   useEffect(() => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws/cars");
-    wsRef.current.onopen = () => console.log("Car WebSocket connected");
-    wsRef.current.onclose = () => console.log("Car WebSocket disconnected");
-    wsRef.current.onerror = (e) => console.error("Car WebSocket error", e);
     wsRef.current.onmessage = (event) => {
       try {
         const carsData = JSON.parse(event.data);
@@ -108,7 +105,7 @@ const CarsPage = () => {
               {/* Car image as background */}
               <div className="relative w-full -z-10 flex items-center justify-center">
                 <img
-                  src={"/car.jpg"}
+                  src={car.imageUrl || "/car.jpg"}
                   alt={car.model}
                   className="w-full h-50 -mt-7 object-cover z-0"
                 />
@@ -170,7 +167,7 @@ const CarsPage = () => {
               Confirm Your Choice
             </h2>
             <img
-              src={"/car.jpg"}
+              src={selectedCar.imageUrl || "/car.jpg"}
               alt={selectedCar.model}
               className="w-full h-40 object-cover rounded mb-4 border border-neutral-200"
             />
