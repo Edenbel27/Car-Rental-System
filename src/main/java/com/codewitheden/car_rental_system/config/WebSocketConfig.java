@@ -19,9 +19,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
-        registry.addHandler(bookingSocketHandler, "/ws/bookings").setAllowedOrigins("*");
+        registry.addHandler(bookingSocketHandler, "/ws/bookings")
+                .setAllowedOrigins("http://localhost:5173", "http://localhost:5174");
         registry.addHandler(
                 applicationContext.getBean(com.codewitheden.car_rental_system.websockethandler.CarSocketHandler.class),
-                "/ws/cars").setAllowedOrigins("*");
+                "/ws/cars")
+                .setAllowedOrigins("http://localhost:5173", "http://localhost:5174");
     }
 }

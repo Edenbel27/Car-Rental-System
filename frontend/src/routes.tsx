@@ -5,11 +5,12 @@ import RegisterPage from "./pages/RegisterPage";
 import CarsPage from "./pages/CarsPage";
 import LoginPage from "./pages/LoginPage";
 import UserDashboard from "./pages/User/UserDashboard";
+import AdminBookingsPage from "./pages/AdminBookingsPage";
 import { useAuth } from "./provider/AuthProvider";
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import AddCar from "./components/AddCar";
 import CarDetail from "./pages/User/CarDetail";
-
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -59,6 +60,22 @@ const routes = createBrowserRouter([
         element: <CarsPage />,
       },
       {
+        path: "/admin/bookings",
+        element: (
+          <ProtectedRoute>
+            <AdminBookingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/add-car",
+        element: (
+          <ProtectedRoute>
+            <AddCar />
+          </ProtectedRoute>
+        ),
+      },
+        {
         path: "/car/:id",
         element: (
           <ProtectedRoute>

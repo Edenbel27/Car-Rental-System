@@ -27,4 +27,8 @@ public class BookingService {
     public java.util.List<Booking> getBookingsByUserId(Long userId) {
         return bookingRepository.findByUserId(userId);
     }
+
+    public java.util.List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
 }
